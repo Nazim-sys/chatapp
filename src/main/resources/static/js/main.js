@@ -12,6 +12,7 @@ var stompClient = null;
 var username = null;
 var isDisconnecting = false;
 var onlineContainer = document.querySelector('.onlineContainer');
+var onlineUserList = document.querySelector('#onlineUsersList');
 var onlineUsers = new Set(); // Track online users
 
 var colors = [
@@ -99,11 +100,11 @@ function onMessageReceived(payload) {
     if (message.type === 'JOIN') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' joined!';
-        addUserToOnlineContainer(message.sender); // Add user to online list
+        addUserToOnlineUserlist(message.sender);
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' left!';
-        removeUserFromOnlineContainer(message.sender); // Remove user from online list
+        removeUserFromOnlineUserList(message.sender);
     } else {
         if (message.sender === username) {
             messageElement.classList.add('sent-message');
@@ -143,34 +144,34 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
-function addUserToOnlineContainer(user) {
+function addUserToOnlineUserlist(user) {
     if (!onlineUsers.has(user)) {
         onlineUsers.add(user);
 
-        var userElement = document.createElement('div');
-        userElement.setAttribute('id', 'user-' + user); // Set unique ID for user element
+        var userElement = document.createElement('li');
+        userElement.setAttribute('id', 'user-' + user);
         userElement.classList.add('user');
 
-        var usernameSpan = document.createElement('span');
-        usernameSpan.textContent = user;
+        var usernamePara = document.createElement('p');
+        usernamePara.textContent = user;
 
-        var statusDot = document.createElement('span');
+        var statusDot = document.createElement('p');
         statusDot.classList.add('status-dot');
-        statusDot.style.backgroundColor = 'green'; // Green dot to indicate online status
+        /*statusDot.style.backgroundColor = 'green';*/ 
 
+        userElement.appendChild(usernamePara);
         userElement.appendChild(statusDot);
-        userElement.appendChild(usernameSpan);
-        onlineContainer.appendChild(userElement);
+        onlineUserList.appendChild(userElement);
     }
 }
 
-function removeUserFromOnlineContainer(user) {
+function removeUserFromOnlineUserList(user) {
     if (onlineUsers.has(user)) {
         onlineUsers.delete(user);
 
         var userElement = document.getElementById('user-' + user);
         if (userElement) {
-            onlineContainer.removeChild(userElement);
+            onlineUserList.removeChild(userElement);
         }
     }
 }

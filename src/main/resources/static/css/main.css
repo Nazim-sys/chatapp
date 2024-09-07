@@ -218,7 +218,7 @@ button.accent {
     background: transparent;
 }
 
-#chat-page .onlineContainer {
+.onlineContainer {
     background-color: transparent;
     backdrop-filter: blur(4px);
     height: calc(100% - 100px);
@@ -227,6 +227,7 @@ button.accent {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 1);
     width: calc(30% - 182px);
     border-left: 1px solid var(--border-color);
+    padding: 0;
 }
 
 .onlineHeader {
@@ -241,24 +242,29 @@ button.accent {
     color: darkgray;
 }
 
-.onlineUser {
+.status-dot 
+{
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: green;
+}
+
+#onlineUsersList .user {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin-bottom: 10px; /* Optional, adjust if needed */
 }
 
-.onlineUser .status-indicator {
-    width: 10px;
-    height: 10px;
-    background-color: green;
-    border-radius: 50%;
-    margin-right: 10px;
+#onlineUsersList .user p {
+    margin: 0;
+    color: lightgray;
 }
 
-.onlineUser .username {
-    color: #fff;
-    font-weight: 500;
+#onlineUsersList .user .status-dot {
+    margin-left: auto; /* Pushes the dot to the right */
 }
+
 
 #chat-page #messageForm {
     padding: 10px;
@@ -274,6 +280,7 @@ button.accent {
 
 #chat-page ul li p {
     margin: 0;
+    color: lightgray;
 }
 
 #chat-page .event-message {
