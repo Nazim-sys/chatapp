@@ -11,6 +11,8 @@ var leaveButton = document.querySelector('.primary.leaveButton');
 var stompClient = null;
 var username = null;
 var isDisconnecting = false;
+var onlineContainer = document.querySelector('.onlineContainer');
+var onlineUsers = new Set(); // Track online users
 
 var colors = [
     '#808080',
@@ -23,7 +25,6 @@ var colors = [
     '#1C1C1C'
 ];
 
-
 function connect(event) {
     event.preventDefault();
 
@@ -32,6 +33,7 @@ function connect(event) {
     if (username) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
+        chatPage.classList.add('show');
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
 
@@ -44,7 +46,7 @@ function onConnected() {
 
     stompClient.send("/app/chat.addUser",
         {},
-        JSON.stringify({sender: username, type: 'JOIN'})
+        JSON.stringify({ sender: username, type: 'JOIN' })
     );
 
     connectingElement.classList.add('hidden');
@@ -81,6 +83,7 @@ function leaveChat(event) {
         stompClient.disconnect(() => {
             usernamePage.classList.remove('hidden');
             chatPage.classList.add('hidden');
+            chatPage.classList.remove('show');
             document.querySelector('#name').value = '';
             location.reload();
         });
@@ -96,9 +99,11 @@ function onMessageReceived(payload) {
     if (message.type === 'JOIN') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' joined!';
+        addUserToOnlineContainer(message.sender); // Add user to online list
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' left!';
+        removeUserFromOnlineContainer(message.sender); // Remove user from online list
     } else {
         if (message.sender === username) {
             messageElement.classList.add('sent-message');
@@ -136,6 +141,38 @@ function getAvatarColor(messageSender) {
     }
     var index = Math.abs(hash % colors.length);
     return colors[index];
+}
+
+function addUserToOnlineContainer(user) {
+    if (!onlineUsers.has(user)) {
+        onlineUsers.add(user);
+
+        var userElement = document.createElement('div');
+        userElement.setAttribute('id', 'user-' + user); // Set unique ID for user element
+        userElement.classList.add('user');
+
+        var usernameSpan = document.createElement('span');
+        usernameSpan.textContent = user;
+
+        var statusDot = document.createElement('span');
+        statusDot.classList.add('status-dot');
+        statusDot.style.backgroundColor = 'green'; // Green dot to indicate online status
+
+        userElement.appendChild(statusDot);
+        userElement.appendChild(usernameSpan);
+        onlineContainer.appendChild(userElement);
+    }
+}
+
+function removeUserFromOnlineContainer(user) {
+    if (onlineUsers.has(user)) {
+        onlineUsers.delete(user);
+
+        var userElement = document.getElementById('user-' + user);
+        if (userElement) {
+            onlineContainer.removeChild(userElement);
+        }
+    }
 }
 
 usernameForm.addEventListener('submit', connect, true);
